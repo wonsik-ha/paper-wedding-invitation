@@ -35,6 +35,8 @@ Fit original card ratio within available viewport height and safe areas. Small l
 ## Interaction states
 Loading: reserve artwork ratio. Asset error: readable reload guidance. Closed: seal guide. Open: pull guide. Extracted: flip/zoom guide. Camera: aim/shutter guidance. Success: brief capture then final URL. Misaligned shutter stays and guides. Replay resets all. Slow/offline: static assets, no backend.
 
+QR discovery: only while reading the back, the QR button makes one tiny sideways nudge every 8 seconds, resting for most of the cycle. Two small pale-blue sparkles fade separately in the whitespace outside the QR, without covering its modules or intercepting gestures. Suppress both cues in camera mode, on the front, and for reduced motion; keep the QR still while enlarged. Hover/focus stops the button motion for easy activation. No extra text, bright halo or continuous shaking.
+
 ## Content voice
 Warm concise Korean honorifics: 인장을 눌러 열어 주세요; 카드를 위로 꺼내 주세요; QR에 맞춰 촬영해 주세요. Keep implementation details outside guest UI.
 

@@ -355,6 +355,64 @@ main:has(.scene[data-phase="reading"]) .arrival {
   position: absolute;
   pointer-events: none;
 }
+.qr-target::before,
+.qr-target::after {
+  content: "";
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  background: #91bfd0;
+  clip-path: polygon(
+    50% 0,
+    62% 38%,
+    100% 50%,
+    62% 62%,
+    50% 100%,
+    38% 62%,
+    0 50%,
+    38% 38%
+  );
+  opacity: 0;
+}
+.qr-target::before {
+  top: -8px;
+  left: -10px;
+}
+.qr-target::after {
+  right: -9px;
+  bottom: -8px;
+  width: 5px;
+  height: 5px;
+}
+.scene[data-phase="reading"][data-side="back"][data-scale="1.00"]:not(
+    [data-camera="true"]
+  )
+  .qr-target::before,
+.scene[data-phase="reading"][data-side="back"][data-scale="1.00"]:not(
+    [data-camera="true"]
+  )
+  .qr-target::after {
+  animation: qr-sparkle 8s ease-in-out infinite;
+  animation-delay: 1.6s;
+}
+.scene[data-phase="reading"][data-side="back"][data-scale="1.00"]:not(
+    [data-camera="true"]
+  )
+  .qr-target::after {
+  animation-delay: 4.4s;
+}
+@keyframes qr-sparkle {
+  0%,
+  24%,
+  100% {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+  12% {
+    opacity: 0.55;
+    transform: scale(1.1);
+  }
+}
 .reading-tools {
   display: flex;
   flex-wrap: wrap;
@@ -414,6 +472,27 @@ main:has(.scene[data-phase="reading"]) .arrival {
 .camera-button svg {
   width: 16px;
   height: 16px;
+}
+.scene[data-phase="reading"][data-side="back"]:not([data-camera="true"])
+  ~ .reading-tools
+  .camera-button:not(:hover):not(:focus-visible) {
+  animation: qr-nudge 8s ease-in-out 2.5s infinite;
+}
+@keyframes qr-nudge {
+  0%,
+  80%,
+  94%,
+  100% {
+    transform: translateX(0) rotate(0);
+  }
+  83%,
+  89% {
+    transform: translateX(-1.2px) rotate(-0.6deg);
+  }
+  86%,
+  92% {
+    transform: translateX(1.2px) rotate(0.6deg);
+  }
 }
 .guidance {
   display: flex;
