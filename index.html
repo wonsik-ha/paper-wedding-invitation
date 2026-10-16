@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#f5f2ed" />
+    <title>원식 & 경민 · 종이 청첩장</title>
+    <meta
+      name="description"
+      content="당신께 전하는 한 장의 초대. 봉투를 열어 저희의 청첩장을 받아 주세요."
+    />
+    <meta property="og:title" content="원식 & 경민 · 당신께 전하는 초대" />
+    <meta
+      property="og:description"
+      content="2026년 11월 8일, 저희의 행복한 앞날을 함께해 주세요."
+    />
+    <meta
+      property="og:image"
+      content="https://wonsik-ha.github.io/paper-wedding-invitation/front.webp"
+    />
+    <meta
+      property="og:url"
+      content="https://wonsik-ha.github.io/paper-wedding-invitation/"
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" as="image" href="/front.webp" />
+    <link rel="preload" as="image" href="/back.webp" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="masthead">
+        <span class="wordmark">SIK <i>&</i> MIN</span>
+        <span class="edition">A LETTER FOR YOU</span>
+        <button
+          id="replay"
+          class="replay"
+          type="button"
+          aria-label="청첩장 다시 받기"
+          title="다시 받기"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 10a8 8 0 1 1 1 7M4 4v6h6" />
+          </svg>
+        </button>
+      </header>
+      <main>
+        <div class="arrival">
+          <p>A LITTLE LETTER, A LOT OF LOVE</p>
+          <h1>청첩장이 도착했습니다!</h1>
+          <span>원식과 경민이 마음을 담아 보냈어요.</span>
+        </div>
+        <div class="chapter">
+          <span class="chapter-line"></span
+          ><span id="chapter-label">WITH LOVE, TO YOU</span
+          ><span class="chapter-line"></span>
+        </div>
+        <div
+          id="scene"
+          class="scene"
+          data-phase="closed"
+          data-side="front"
+          data-scale="1"
+        >
+          <div class="rig">
+            <div class="envelope-back" aria-hidden="true"></div>
+            <div
+              id="card"
+              class="card"
+              role="button"
+              tabindex="-1"
+              aria-label="청첩장 앞면"
+              aria-disabled="true"
+            >
+              <div class="card-turn">
+                <div class="card-face front">
+                  <img
+                    id="front-image"
+                    src="/front.webp"
+                    alt="원식과 경민의 사진, 2026년 11월 8일 오후 1시 웨딩메르디앙 8층 아토아띠 홀"
+                    draggable="false"
+                  />
+                </div>
+                <div class="card-face back">
+                  <img
+                    id="back-image"
+                    src="/back.webp"
+                    alt="서로를 아껴주고 사랑하며 모든 계절을 나란히 걸어가려 합니다. 하원식과 김경민의 청첩장과 모바일 청첩장 QR"
+                    draggable="false"
+                  /><span
+                    id="qr-target"
+                    class="qr-target"
+                    aria-hidden="true"
+                  ></span>
+                </div>
+              </div>
+            </div>
+            <div class="envelope-pocket" aria-hidden="true"></div>
+            <div class="envelope-flap" aria-hidden="true"></div>
+            <div class="envelope-photo" aria-hidden="true">
+              <img src="/vellum-envelope.png" alt="" draggable="false" />
+            </div>
+            <button
+              id="seal"
+              class="seal"
+              type="button"
+              aria-label="인장을 눌러 봉투 열기"
+            ></button>
+          </div>
+          <div id="camera-layer" class="camera-layer" hidden></div>
+        </div>
+        <div class="reading-tools" id="reading-tools" hidden>
+          <button id="flip" class="text-button" type="button">
+            <span aria-hidden="true">↻</span> 뒤집기
+          </button>
+          <span class="tool-divider"></span>
+          <button
+            id="zoom-out"
+            class="icon-button"
+            type="button"
+            aria-label="축소"
+          >
+            −
+          </button>
+          <button
+            id="zoom-reset"
+            class="zoom-reset"
+            type="button"
+            aria-label="원래 크기로"
+          >
+            100%
+          </button>
+          <button
+            id="zoom-in"
+            class="icon-button"
+            type="button"
+            aria-label="확대"
+          >
+            +
+          </button>
+          <button id="camera-open" class="camera-button" type="button" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 6l1-2h6l1 2h4v14H4V6z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+            QR 찍기
+          </button>
+        </div>
+        <div class="guidance" id="guidance">
+          <div
+            id="guide-motion"
+            class="guide-motion"
+            data-action="seal"
+            aria-hidden="true"
+          >
+            <svg viewBox="0 0 32 40">
+              <path
+                d="M12 24V7a3 3 0 0 1 6 0v12l2-2a3 3 0 0 1 5 2l2 5c1 3 0 7-2 10l-2 3H12l-8-11a3 3 0 0 1 4-4l4 4"
+              />
+              <path class="touch-ring" d="M7 8a8 8 0 0 1 16 0" />
+            </svg>
+          </div>
+          <div
+            class="guide-copy"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <p id="guide-title">인장을 눌러 열어 주세요</p>
+            <p id="guide-detail">당신께 전하고 싶은 이야기가 있어요.</p>
+          </div>
+          <button id="extract" class="extract-link" type="button" hidden>
+            카드 꺼내기 <span aria-hidden="true">↑</span>
+          </button>
+        </div>
+        <div id="asset-error" class="asset-error" role="alert" hidden>
+          청첩장을 불러오지 못했어요. 잠시 후 다시 열어 주세요.<button
+            type="button"
+            id="reload"
+          >
+            다시 불러오기
+          </button>
+        </div>
+      </main>
+      <footer>
+        <span>2026. 11. 08</span><span class="footer-dot"></span
+        ><span>원식 그리고 경민</span
+        ><span class="page-count" id="page-count">01 — 04</span>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
