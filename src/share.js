@@ -9,11 +9,9 @@ export function setupSharing() {
   if (name)
     document.querySelector(".arrival h1").textContent =
       `${name} 님께 청첩장이 도착했습니다!`;
-  for (const recipient of document.querySelectorAll(".card-recipient")) {
-    recipient.textContent = name ? `${name} 님께` : "";
-    recipient.title = recipient.textContent;
-    recipient.hidden = !name;
-  }
+  const recipient = document.querySelector("#recipient");
+  recipient.textContent = name ? `${name} 님께` : "";
+  recipient.hidden = !name;
 
   const open = document.querySelector("#share-open");
   const dialog = document.querySelector("#share-dialog");
@@ -75,14 +73,13 @@ export function setupSharing() {
     input.value = to;
     link.value = buildRecipientUrl(window.location.href, to);
     result.hidden = false;
-    const invitation = `${messageFor(to)}\n- 청첩장: ${link.value}`;
+    const invitation = `[원식 & 경민 · 종이 청첩장]\n${messageFor(to)}\n- 청첩장: ${link.value}`;
     status.textContent = "";
     submit.disabled = true;
     try {
       if (typeof navigator.share === "function") {
         try {
           await navigator.share({
-            title: "원식 & 경민 · 종이 청첩장",
             text: invitation,
           });
           status.textContent = "초대를 공유했어요.";

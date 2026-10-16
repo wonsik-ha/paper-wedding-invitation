@@ -598,11 +598,11 @@ footer {
   color: #92a6aa;
   font-variant-numeric: tabular-nums;
 }
-.card-recipient {
+.envelope-recipient {
   position: absolute;
-  right: 5%;
-  bottom: 2%;
-  max-width: 80%;
+  right: 10%;
+  bottom: 10%;
+  max-width: 70%;
   font-family: "AppleMyungjo", "Nanum Myeongjo", Georgia, serif;
   font-size: clamp(12px, calc(var(--card-w) * 0.05), 17px);
   line-height: 1.4;
@@ -612,6 +612,9 @@ footer {
   text-overflow: ellipsis;
   color: #44565a;
   pointer-events: none;
+}
+.scene:not([data-phase="closed"]) .envelope-recipient {
+  visibility: hidden;
 }
 .share-dialog {
   width: min(420px, calc(100% - 36px));
