@@ -802,10 +802,97 @@ test('supplied Galaxy body contains the scanner UI; light and gallery controls w
   await page.getByRole('button', { name: '조명 켜기', exact: true }).click();
   await expect(page.locator('.phone')).toHaveClass(/light-on/);
   await expect(page.locator('#camera-light')).toHaveAttribute('aria-pressed', 'true');
-  await page.getByRole('button', { name: '청첩장으로 돌아가기', exact: true }).click();
+  await page.getByRole('button', { name: '갤러리 열기', exact: true }).click();
+  await expect(page.locator('.gallery-grid button')).toHaveCount(7);
+  await page.locator('#camera-close').click();
   await expect(page.locator('#camera-layer')).toBeHidden();
   await expect(page.locator('#camera-open')).toBeFocused();
   await openCamera(page);
   await expect(page.locator('#camera-light')).toHaveAttribute('aria-pressed', 'false');
   await expect(page.locator('.phone')).not.toHaveClass(/light-on/);
+});
+
+
+test('bear gallery opens every supplied image within the phone and returns to manual QR aiming', async ({ page }) => {
+  await loadFresh(page);
+  await toBack(page);
+  await openCamera(page);
+  await page.locator('#camera-gallery').click();
+  await expect(page.locator('.phone')).toHaveAttribute('data-screen', 'gallery');
+  await expect(page.locator('#shutter')).toBeHidden();
+  await expect(page.locator('.gallery-grid button')).toHaveCount(7);
+  await expect.poll(() => page.locator('.gallery-grid img').evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0))).toBe(true);
+  const before = await page.locator('.phone').boundingBox();
+  for (let index = 0; index < 7; index++) {
+    await page.getByRole('button', { name: `곰 사진 ${index + 1} 보기`, exact: true }).click();
+    await expect(page.locator('.phone')).toHaveAttribute('data-screen', 'photo');
+    await expect(page.locator('.gallery-photo')).toHaveAttribute('src', new RegExp(`bear-${index + 1}\\.png$`));
+    await expect.poll(() => page.locator('.gallery-photo').evaluate(image => image.complete && image.naturalWidth > 0)).toBe(true);
+    await expect(page.locator('.gallery-photo')).toHaveCSS('object-fit', 'contain');
+    await expect(page.locator('.photo-count')).toHaveText(`${index + 1} / 7`);
+    const image = await page.locator('.gallery-photo').boundingBox();
+    expect(image.x).toBeGreaterThan(before.x);
+    expect(image.x + image.width).toBeLessThan(before.x + before.width);
+    expect(image.y + image.height).toBeLessThan(before.y + before.height);
+    await page.getByRole('button', { name: '사진첩으로 돌아가기', exact: true }).click();
+    await expect(page.locator('.gallery-grid')).toBeVisible();
+  }
+  const after = await page.locator('.phone').boundingBox();
+  expect(after).toEqual(before); // Looking through photos must not drag the phone.
+  await page.locator('#phone-back').click();
+  await expect(page.locator('.phone')).toHaveAttribute('data-screen', 'camera');
+  await expect(page.locator('#camera-gallery')).toBeFocused();
+  await dragPhoneToQr(page);
+  const requests = await interceptDestination(page);
+  await page.locator('#shutter').click();
+  await page.waitForURL(DESTINATION);
+  expect(requests).toEqual([DESTINATION]);
+});
+
+test('photo navigation, nested Escape, home and replay keep gallery state isolated', async ({ page }) => {
+  await loadFresh(page);
+  await toBack(page);
+  await openCamera(page);
+  await page.locator('#phone-albums').click();
+  await page.getByRole('button', { name: '곰 사진 1 보기', exact: true }).click();
+  await expect(page.locator('.photo-previous')).toBeDisabled();
+  await page.locator('.photo-next').click();
+  await expect(page.locator('.photo-count')).toHaveText('2 / 7');
+  await page.keyboard.press('ArrowRight');
+  await expect(page.locator('.photo-count')).toHaveText('3 / 7');
+  await page.keyboard.press('ArrowLeft');
+  await expect(page.locator('.photo-count')).toHaveText('2 / 7');
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.phone')).toHaveAttribute('data-screen', 'gallery');
+  await expect(page.getByRole('button', { name: '곰 사진 2 보기', exact: true })).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.phone')).toHaveAttribute('data-screen', 'camera');
+  await page.locator('#camera-gallery').click();
+  await page.getByRole('button', { name: '곰 사진 7 보기', exact: true }).click();
+  await expect(page.locator('.photo-next')).toBeDisabled();
+  await page.locator('#phone-home').click();
+  await expect(page.locator('.phone')).toHaveAttribute('data-screen', 'camera');
+  await page.locator('#camera-gallery').click();
+  await page.locator('#replay').click();
+  await expect(page.locator('#camera-layer')).toBeHidden();
+  await toBack(page);
+  await openCamera(page);
+  await expect(page.locator('.phone')).toHaveAttribute('data-screen', 'camera');
+  await expect(page.locator('.gallery-panel')).toBeHidden();
+});
+
+test('a missing album photo reports the failure and the next photo remains usable', async ({ page }) => {
+  await page.route('**/bears/bear-2.png', route => route.abort());
+  await loadFresh(page);
+  await toBack(page);
+  await openCamera(page);
+  await page.locator('#camera-gallery').click();
+  await page.getByRole('button', { name: '곰 사진 2 보기', exact: true }).click();
+  await expect(page.locator('.photo-error')).toBeVisible();
+  await page.locator('.photo-next').click();
+  await expect.poll(() => page.locator('.gallery-photo').evaluate(image => image.complete && image.naturalWidth > 0)).toBe(true);
+  await expect(page.locator('.photo-error')).toBeHidden();
+  await expect(page.locator('.photo-count')).toHaveText('3 / 7');
+  await page.locator('#phone-back').click();
+  await expect(page.locator('.gallery-grid')).toBeVisible();
 });

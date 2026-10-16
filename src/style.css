@@ -564,6 +564,7 @@ footer {
   background: #050709;
   box-shadow: inset 0 0 0 1px #283039;
   pointer-events: none;
+  z-index: 3;
 }
 .phone-top {
   position: absolute;
@@ -571,6 +572,15 @@ footer {
   height: 44px;
   display: flex;
   align-items: start;
+  z-index: 3;
+}
+.scanner-ui {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.scanner-ui button {
+  pointer-events: auto;
 }
 .phone-top > span {
   font-size: 8px;
@@ -709,19 +719,108 @@ footer {
 }
 .phone-navigation {
   position: absolute;
-  bottom: 3%;
-  left: 12%;
-  right: 12%;
+  bottom: 0;
+  left: 4%;
+  right: 4%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-size: 20px;
   line-height: 1;
-  pointer-events: none;
   opacity: 0.9;
+  z-index: 3;
 }
-.phone-navigation span:nth-child(2) {
+.phone-navigation button {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 20px;
+  padding: 0;
+}
+.phone-navigation button:nth-child(2) {
   font-size: 19px;
+}
+.phone[data-screen="gallery"] .phone-screen,
+.phone[data-screen="photo"] .phone-screen {
+  background: #080808;
+}
+.gallery-panel {
+  position: absolute;
+  inset: 30px 0 44px;
+  background: #080808;
+  cursor: default;
+}
+.gallery-heading {
+  height: 48px;
+  display: flex;
+  align-items: center;
+}
+.gallery-heading button,
+.photo-controls button {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: 0;
+  background: none;
+  color: #fff;
+  font-size: 26px;
+  padding: 0;
+}
+.gallery-heading strong {
+  display: block;
+  font-size: 15px;
+}
+.gallery-heading span {
+  display: block;
+  margin-top: 3px;
+  color: #aaa;
+  font-size: 9px;
+}
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2px;
+  padding: 4px;
+}
+.gallery-grid button {
+  aspect-ratio: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: #252525;
+  overflow: hidden;
+}
+.gallery-grid img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.photo-viewer {
+  height: calc(100% - 48px);
+  position: relative;
+}
+.gallery-photo {
+  width: 100%;
+  height: calc(100% - 44px);
+  object-fit: contain;
+}
+.photo-controls {
+  display: flex;
+  height: 44px;
+  align-items: center;
+  justify-content: space-between;
+}
+.photo-count {
+  font-size: 10px;
+  color: #ccc;
+}
+.photo-error {
+  position: absolute;
+  inset: 30% 10px auto;
+  font-size: 11px;
+  text-align: center;
 }
 .capture-flash {
   position: absolute;

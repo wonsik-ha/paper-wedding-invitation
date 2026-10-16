@@ -1,5 +1,6 @@
 import { MOBILE_INVITATION_URL } from "./config.js";
 import { cameraAligned, clamp } from "./geometry.js";
+import { createGallery } from "./gallery.js";
 
 export function createCamera({ scene, state, reader, guide, updateGuide }) {
   const layer = document.querySelector("#camera-layer");
@@ -12,13 +13,13 @@ export function createCamera({ scene, state, reader, guide, updateGuide }) {
         <div class="viewfinder" aria-hidden="true"><img class="camera-preview" src="${import.meta.env.BASE_URL}back.webp" alt="" draggable="false"><div class="camera-shade"></div><div class="reticle"><i></i><i></i><i></i><i></i></div><div class="capture-flash"></div></div>
         <div class="phone-top"><span aria-hidden="true">9:41</span><button id="camera-close" type="button" aria-label="촬영 닫기">×</button></div>
         <span class="phone-lens" aria-hidden="true"></span>
-        <p class="camera-status" id="camera-status" role="status">QR 코드를 찾는 중입니다.</p>
+        <div class="scanner-ui"><p class="camera-status" id="camera-status" role="status">QR 코드를 찾는 중입니다.</p>
         <div class="scanner-controls">
           <button id="camera-light" type="button" aria-label="조명 켜기" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10l-3 5v8h-4v-8zM8 3v1M12 2v2M16 3v1"/></svg></button>
           <button id="shutter" class="shutter" type="button" aria-label="QR 촬영"><span></span></button>
-          <button id="camera-gallery" type="button" aria-label="청첩장으로 돌아가기"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="9" cy="9" r="1.5"/><path d="m5 17 5-5 4 4 3-3 3 3"/></svg></button>
-        </div>
-        <div class="phone-navigation" aria-hidden="true"><span>‹</span><span>▢</span><span>Ⅲ</span></div>
+          <button id="camera-gallery" type="button" aria-label="갤러리 열기"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="9" cy="9" r="1.5"/><path d="m5 17 5-5 4 4 3-3 3 3"/></svg></button>
+        </div></div>
+        <div class="phone-navigation"><button type="button" id="phone-back" aria-label="휴대전화 뒤로">‹</button><button type="button" id="phone-home" aria-label="QR 촬영 화면">▢</button><button type="button" id="phone-albums" aria-label="곰 사진첩 열기">Ⅲ</button></div>
       </div>
     </div>`;
   const phone = layer.querySelector(".phone");
@@ -34,6 +35,35 @@ export function createCamera({ scene, state, reader, guide, updateGuide }) {
   let navigationTimer = null;
   let captured = false;
   let frame = null;
+  const gallery = createGallery({
+    screen: layer.querySelector(".phone-screen"),
+    onChange(mode) {
+      phone.dataset.screen = mode || "camera";
+      layer.querySelector(".scanner-ui").hidden = Boolean(mode);
+      viewfinder.hidden = Boolean(mode);
+      if (!state.camera) return;
+      if (mode) {
+        guide(
+          mode === "photo"
+            ? "휴대전화 속 곰 사진을 보고 있어요"
+            : "곰 사진첩을 열었어요",
+          mode === "photo"
+            ? "화살표로 사진을 넘기고, 뒤로 버튼으로 사진첩에 돌아가세요."
+            : "사진을 눌러 크게 보세요. 뒤로 버튼을 누르면 QR 촬영으로 돌아가요.",
+          "read",
+          "04",
+        );
+      } else {
+        guide(
+          "휴대전화를 끌어 QR에 맞춰 주세요",
+          "조준한 뒤 동그란 촬영 버튼을 눌러 주세요.",
+          "aim",
+          "04",
+        );
+        layer.querySelector("#camera-gallery").focus({ preventScroll: true });
+      }
+    },
+  });
 
   function aligned() {
     const aim = reticle.getBoundingClientRect();
@@ -86,6 +116,7 @@ export function createCamera({ scene, state, reader, guide, updateGuide }) {
     document.querySelector("#card").tabIndex = -1;
     layer.hidden = false;
     captured = false;
+    gallery.reset();
     shutter.disabled = false;
     lightButton.setAttribute("aria-pressed", "false");
     lightButton.setAttribute("aria-label", "조명 켜기");
@@ -112,6 +143,7 @@ export function createCamera({ scene, state, reader, guide, updateGuide }) {
     drag = null;
     state.camera = false;
     captured = false;
+    gallery.reset();
     layer.hidden = true;
     phone.classList.remove("captured", "dragging");
     scene.removeAttribute("data-camera");
@@ -126,9 +158,18 @@ export function createCamera({ scene, state, reader, guide, updateGuide }) {
   }
   openButton.addEventListener("click", open);
   layer.querySelector("#camera-close").addEventListener("click", () => close());
-  layer
-    .querySelector("#camera-gallery")
-    .addEventListener("click", () => close());
+  layer.querySelector("#camera-gallery").addEventListener("click", () => {
+    if (!captured) gallery.open();
+  });
+  layer.querySelector("#phone-back").addEventListener("click", () => {
+    if (!gallery.back()) close();
+  });
+  layer.querySelector("#phone-home").addEventListener("click", () => {
+    if (!captured) gallery.reset();
+  });
+  layer.querySelector("#phone-albums").addEventListener("click", () => {
+    if (!captured) gallery.open();
+  });
   lightButton.addEventListener("click", () => {
     const enabled = lightButton.getAttribute("aria-pressed") !== "true";
     lightButton.setAttribute("aria-pressed", String(enabled));
@@ -138,6 +179,7 @@ export function createCamera({ scene, state, reader, guide, updateGuide }) {
   phone.addEventListener("pointerdown", (event) => {
     if (
       captured ||
+      event.target.closest(".gallery-panel") ||
       drag ||
       event.button !== 0 ||
       event.target.closest("button")
@@ -170,8 +212,10 @@ export function createCamera({ scene, state, reader, guide, updateGuide }) {
   phone.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
       event.preventDefault();
-      close();
+      if (!gallery.back()) close();
+      return;
     }
+    if (gallery.handleKey(event) || gallery.isOpen()) return;
     if (
       captured ||
       !["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)
@@ -186,7 +230,7 @@ export function createCamera({ scene, state, reader, guide, updateGuide }) {
     render();
   });
   shutter.addEventListener("click", () => {
-    if (captured || !state.camera) return;
+    if (captured || !state.camera || gallery.isOpen()) return;
     if (!aligned()) {
       guide(
         "QR에 조금 더 가까이 맞춰 주세요",
