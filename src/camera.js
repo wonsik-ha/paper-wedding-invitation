@@ -109,7 +109,6 @@ export function createCamera({ scene, state, reader, guide, updateGuide }) {
       return;
     reader.clearGesture();
     previousView = { scale: state.scale, panX: state.panX, panY: state.panY };
-    reader.setScale(1);
     state.camera = true;
     scene.dataset.camera = "true";
     tools.inert = true;
@@ -127,7 +126,7 @@ export function createCamera({ scene, state, reader, guide, updateGuide }) {
     };
     guide(
       "휴대전화를 끌어 QR에 맞춰 주세요",
-      "카드는 원래 크기로 맞췄어요. 조준한 뒤 동그란 촬영 버튼을 눌러 주세요.",
+      "조준한 뒤 동그란 촬영 버튼을 눌러 주세요.",
       "aim",
       "04",
     );

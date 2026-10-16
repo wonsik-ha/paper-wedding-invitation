@@ -89,6 +89,7 @@
                     alt="원식과 경민의 사진, 2026년 11월 8일 오후 1시 웨딩메르디앙 8층 아토아띠 홀"
                     draggable="false"
                   />
+                  <span id="recipient" class="card-recipient" hidden></span>
                 </div>
                 <div class="card-face back">
                   <img
@@ -101,6 +102,7 @@
                     class="qr-target"
                     aria-hidden="true"
                   ></span>
+                  <span class="card-recipient" hidden></span>
                 </div>
               </div>
             </div>
@@ -194,10 +196,7 @@
       <footer>
         <span>2026. 11. 08</span><span class="footer-dot"></span
         ><span>원식 그리고 경민</span
-        ><span class="footer-right"
-          ><span id="recipient" class="recipient" hidden></span
-          ><span class="page-count" id="page-count">01 — 04</span></span
-        >
+        ><span class="page-count" id="page-count">01 — 04</span>
       </footer>
     </div>
     <dialog
@@ -225,7 +224,7 @@
           id="recipient-name"
           name="recipient"
           type="text"
-          placeholder="예: 민수"
+          placeholder="예: 경민"
           maxlength="40"
           autocomplete="off"
         />

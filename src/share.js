@@ -5,10 +5,15 @@ import {
 } from "./share-url.js";
 
 export function setupSharing() {
-  const recipient = document.querySelector("#recipient");
   const name = getRecipient(window.location.search);
-  recipient.textContent = name ? `${name} 님께` : "";
-  recipient.hidden = !name;
+  if (name)
+    document.querySelector(".arrival h1").textContent =
+      `${name} 님께 청첩장이 도착했습니다!`;
+  for (const recipient of document.querySelectorAll(".card-recipient")) {
+    recipient.textContent = name ? `${name} 님께` : "";
+    recipient.title = recipient.textContent;
+    recipient.hidden = !name;
+  }
 
   const open = document.querySelector("#share-open");
   const dialog = document.querySelector("#share-dialog");
@@ -27,8 +32,8 @@ export function setupSharing() {
 
   open.addEventListener("click", () => {
     form.reset();
-    input.value = name;
-    preview.textContent = messageFor(name);
+    input.value = name || "경민";
+    preview.textContent = messageFor(input.value);
     result.hidden = true;
     status.textContent = "";
     dialog.showModal();
@@ -70,7 +75,7 @@ export function setupSharing() {
     input.value = to;
     link.value = buildRecipientUrl(window.location.href, to);
     result.hidden = false;
-    const invitation = `${messageFor(to)}\n${link.value}`;
+    const invitation = `${messageFor(to)}\n- 청첩장: ${link.value}`;
     status.textContent = "";
     submit.disabled = true;
     try {
@@ -78,8 +83,7 @@ export function setupSharing() {
         try {
           await navigator.share({
             title: "원식 & 경민 · 종이 청첩장",
-            text: messageFor(to),
-            url: link.value,
+            text: invitation,
           });
           status.textContent = "초대를 공유했어요.";
           return;

@@ -25,16 +25,41 @@ async function openSharing(page) {
   await expect(page.locator('#recipient-name')).toBeFocused();
 }
 
-test('query name is plain text at the lower right, hidden when absent, and survives replay', async ({ page }) => {
+test('query name is plain text at the card lower right on both faces, hidden when absent, and survives replay', async ({ page }) => {
   await page.goto('./');
   await expect(page.locator('#recipient')).toBeHidden();
+  await expect(page.locator('.arrival h1')).toHaveText('청첩장이 도착했습니다!');
   const name = '민수 & 지연 💐';
   await page.goto('./?to=' + encodeURIComponent(name));
   await expect(page.locator('#recipient')).toHaveText(name + ' 님께');
+  await expect(page.locator('.arrival h1')).toHaveText(name + ' 님께 청첩장이 도착했습니다!');
+  await page.locator('#seal').click();
+  await page.locator('#extract').click();
+  await page.waitForFunction(() => document.getAnimations().every(a => a.effect?.getTiming().iterations === Infinity || a.playState !== 'running'));
+  await expect(page.locator('#recipient')).toBeVisible();
+  // An inactive face must contribute no pixels, including composited text overlays.
+  const frontPixels = await page.locator('#card').screenshot({ animations: 'disabled' });
+  await page.locator('.card-face.back').evaluate(el => { el.style.display = 'none'; });
+  expect(await page.locator('#card').screenshot({ animations: 'disabled' })).toEqual(frontPixels);
+  await page.locator('.card-face.back').evaluate(el => { el.style.display = ''; });
+
   const recipient = await page.locator('#recipient').boundingBox();
-  const pageBox = await page.locator('.page').boundingBox();
-  expect(recipient.x + recipient.width).toBeGreaterThan(pageBox.x + pageBox.width * .8);
-  expect(recipient.y).toBeGreaterThan(pageBox.y + pageBox.height * .8);
+  const card = await page.locator('#card').boundingBox();
+  expect(recipient.x + recipient.width).toBeGreaterThan(card.x + card.width * .9);
+  expect(recipient.y).toBeGreaterThan(card.y + card.height * .9);
+  expect(recipient.x + recipient.width).toBeLessThan(card.x + card.width);
+  expect(recipient.y + recipient.height).toBeLessThan(card.y + card.height);
+  await page.locator('#flip').click();
+  await expect(page.locator('.back .card-recipient')).toHaveText(name + ' 님께');
+  await page.waitForFunction(() => document.getAnimations().every(a => a.effect?.getTiming().iterations === Infinity || a.playState !== 'running'));
+  const backPixels = await page.locator('#card').screenshot({ animations: 'disabled' });
+  await page.locator('.card-face.front').evaluate(el => { el.style.display = 'none'; });
+  expect(await page.locator('#card').screenshot({ animations: 'disabled' })).toEqual(backPixels);
+  await page.locator('.card-face.front').evaluate(el => { el.style.display = ''; });
+  await page.locator('#zoom-in').click();
+  await expect(page.locator('#zoom-reset')).toHaveText('150%');
+  await expect(page.locator('.back .card-recipient')).toHaveText(name + ' 님께');
+  expect(await page.locator('.back .card-recipient').evaluate(el => getComputedStyle(el).pointerEvents)).toBe('none');
   await page.locator('#replay').click();
   await expect(page.locator('#recipient')).toHaveText(name + ' 님께');
   const markup = '<img src=x onerror=alert(1)>';
@@ -56,13 +81,15 @@ test('native share uses the query name, accepts a new recipient, and opens a mat
   await expect(page.locator('#share-status')).toHaveText('초대를 공유했어요.');
   const [payload] = await page.evaluate(() => window.sharedInvitations);
   expect(payload.title).toBe('원식 & 경민 · 종이 청첩장');
-  expect(payload.text).toBe(name + ' 님께, 원식과 경민의 청첩장을 전합니다.');
-  const url = new URL(payload.url);
+  const sharedUrl = await page.locator('#share-link').inputValue();
+  expect(payload.text).toBe(name + ' 님께, 원식과 경민의 청첩장을 전합니다.\n- 청첩장: ' + sharedUrl);
+  expect(payload.url).toBeUndefined();
+  const url = new URL(sharedUrl);
   expect(url.pathname).toBe('/paper-wedding-invitation/');
   expect([...url.searchParams]).toEqual([['to', name]]);
   expect(url.hash).toBe('');
   await expect(page.locator('#recipient')).toHaveText('처음 손님 님께');
-  await page.goto(payload.url);
+  await page.goto(sharedUrl);
   await expect(page.locator('#recipient')).toHaveText(name + ' 님께');
 });
 
@@ -70,19 +97,21 @@ test('no query or an emptied name shares the original default message and clean 
   await sharingMock(page);
   await page.goto('./?tracking=1#unused');
   await openSharing(page);
-  await expect(page.locator('#recipient-name')).toHaveValue('');
+  await expect(page.locator('#recipient-name')).toHaveValue('경민');
+  await expect(page.locator('#share-preview')).toHaveText('경민 님께, 원식과 경민의 청첩장을 전합니다.');
+  await page.locator('#recipient-name').fill('');
   await expect(page.locator('#share-preview')).toHaveText(DEFAULT_MESSAGE);
   await page.locator('#share-submit').click();
   let payload = await page.evaluate(() => window.sharedInvitations.at(-1));
-  expect(payload.text).toBe(DEFAULT_MESSAGE);
-  expect(new URL(payload.url).search).toBe('');
+  expect(payload.text).toBe(DEFAULT_MESSAGE + '\n- 청첩장: ' + await page.locator('#share-link').inputValue());
+  expect(new URL(await page.locator('#share-link').inputValue()).search).toBe('');
   await page.goto('./?to=' + encodeURIComponent('민수'));
   await openSharing(page);
   await page.locator('#recipient-name').fill('   ');
   await page.locator('#share-submit').click();
   payload = await page.evaluate(() => window.sharedInvitations.at(-1));
-  expect(payload.text).toBe(DEFAULT_MESSAGE);
-  expect(new URL(payload.url).search).toBe('');
+  expect(payload.text).toBe(DEFAULT_MESSAGE + '\n- 청첩장: ' + await page.locator('#share-link').inputValue());
+  expect(new URL(await page.locator('#share-link').inputValue()).search).toBe('');
 });
 
 test('unsupported native share copies personalized text and URL; explicit copy copies only the URL', async ({ page }) => {
@@ -94,7 +123,7 @@ test('unsupported native share copies personalized text and URL; explicit copy c
   await expect(page.locator('#share-status')).toContainText('초대 문구와 링크를 복사했어요.');
   const url = await page.locator('#share-link').inputValue();
   expect(new URL(url).searchParams.get('to')).toBe('민수');
-  expect(await page.evaluate(() => window.copiedInvitations)).toEqual(['민수 님께, 원식과 경민의 청첩장을 전합니다.\n' + url]);
+  expect(await page.evaluate(() => window.copiedInvitations)).toEqual(['민수 님께, 원식과 경민의 청첩장을 전합니다.\n- 청첩장: ' + url]);
   await page.locator('#share-copy').click();
   expect(await page.evaluate(() => window.copiedInvitations.at(-1))).toBe(url);
 });

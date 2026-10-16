@@ -141,6 +141,9 @@ main {
   margin: 0 0 13px;
 }
 .arrival h1 {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
   font-family: "AppleMyungjo", "Nanum Myeongjo", Georgia, serif;
   font-size: 25px;
   font-weight: 400;
@@ -317,6 +320,13 @@ main:has(.scene[data-phase="reading"]) .arrival {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   background: #fff;
+  /* Hide inactive descendants explicitly when WebKit flattens their layers. */
+  visibility: hidden;
+  transition: visibility 0s linear 0.16s;
+}
+.scene:not([data-phase="closed"])[data-side="front"] .card-face.front,
+.scene:not([data-phase="closed"])[data-side="back"] .card-face.back {
+  visibility: visible;
 }
 .card-face.back {
   transform: rotateY(180deg);
@@ -582,27 +592,26 @@ footer {
   border-radius: 50%;
 }
 .page-count {
+  margin-left: auto;
   font-size: 9px;
   letter-spacing: 2px;
   color: #92a6aa;
   font-variant-numeric: tabular-nums;
 }
-.footer-right {
-  margin-left: auto;
-  min-width: 0;
-  display: grid;
-  justify-items: end;
-  text-align: right;
-  gap: 8px;
-  max-width: 45%;
-}
-.recipient {
+.card-recipient {
+  position: absolute;
+  right: 5%;
+  bottom: 2%;
+  max-width: 80%;
   font-family: "AppleMyungjo", "Nanum Myeongjo", Georgia, serif;
-  font-size: 15px;
-  line-height: 1.6;
+  font-size: clamp(12px, calc(var(--card-w) * 0.05), 17px);
+  line-height: 1.4;
   letter-spacing: 0;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: #44565a;
+  pointer-events: none;
 }
 .share-dialog {
   width: min(420px, calc(100% - 36px));

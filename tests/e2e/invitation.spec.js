@@ -479,7 +479,7 @@ test.describe('camera', () => {
     await toBack(page);
   });
 
-  test('opening the camera resets zoom; closing restores the previous zoom and pan and focus', async ({ page }) => {
+  test('camera preserves zoom and pan throughout aiming, gallery and closing', async ({ page }) => {
     await page.locator('#zoom-in').click();
     await page.locator('#zoom-in').click();
     await settle(page);
@@ -492,7 +492,26 @@ test.describe('camera', () => {
 
     await openCamera(page);
     let state = await snapshot(page);
-    expect([state.scale, state.panX, state.panY, state.camera]).toEqual([1, 0, 0, true]);
+    expect([state.scale, state.panX, state.panY, state.camera]).toEqual([before.scale, before.panX, before.panY, true]);
+    const previewWidth = await page.locator('.camera-preview').evaluate(el => parseFloat(el.style.width));
+    const artWidth = await page.locator('#back-image').evaluate(el => el.getBoundingClientRect().width);
+    expect(previewWidth).toBeCloseTo(artWidth, 1);
+    const phoneStart = await pointOn(page, '.phone', .15, .08);
+    await mouseDrag(page, phoneStart, {x: phoneStart.x + 15, y: phoneStart.y + 20});
+    await page.locator('.phone').focus();
+    await page.keyboard.press('+');
+    await page.keyboard.press('ArrowDown');
+    await page.locator('#card').dispatchEvent('wheel', {deltaY: -500});
+    await page.locator('#zoom-in').dispatchEvent('click');
+    await page.locator('#zoom-reset').dispatchEvent('click');
+    state = await snapshot(page);
+    expect([state.scale, state.panX, state.panY]).toEqual([before.scale, before.panX, before.panY]);
+    expect(await page.locator('.camera-preview').evaluate(el => parseFloat(el.style.width))).toBeCloseTo(previewWidth, 1);
+    await page.locator('#camera-gallery').click();
+    await page.locator('#phone-home').click();
+    await page.locator('.phone').focus();
+    state = await snapshot(page);
+    expect([state.scale, state.panX, state.panY]).toEqual([before.scale, before.panX, before.panY]);
     await expect(page.locator('.phone')).toBeFocused();
     await expect(page.locator('#card')).toHaveAttribute('tabindex', '-1');
 

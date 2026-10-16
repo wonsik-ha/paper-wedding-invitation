@@ -33,6 +33,7 @@ export function createReader({ card, scene, state, onChange }) {
   }
 
   function setScale(next, point) {
+    if (!enabled()) return;
     const scale = clamp(next, 1, 4);
     if (point) {
       const rect = card.getBoundingClientRect();
