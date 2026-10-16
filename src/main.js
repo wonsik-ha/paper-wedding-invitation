@@ -3,6 +3,9 @@ import { ARTWORK, QR_REGION } from "./config.js";
 import { extractionComplete } from "./geometry.js";
 import { createReader } from "./reader.js";
 import { createCamera } from "./camera.js";
+import { setupSharing } from "./share.js";
+
+setupSharing();
 
 const scene = document.querySelector("#scene");
 const card = document.querySelector("#card");

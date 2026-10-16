@@ -380,6 +380,8 @@ test.describe('keyboard', () => {
     const requests = await interceptDestination(page);
     if (browserName === 'chromium') {
       await page.keyboard.press('Tab');
+      await expect(page.locator('#share-open')).toBeFocused();
+      await page.keyboard.press('Tab');
       await expect(page.locator('#replay')).toBeFocused();
       await page.keyboard.press('Tab');
     } else {

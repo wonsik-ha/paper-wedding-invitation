@@ -35,6 +35,12 @@
       <header class="masthead">
         <span class="wordmark">SIK <i>&</i> MIN</span>
         <span class="edition">A LETTER FOR YOU</span>
+        <button id="share-open" class="share-open" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 16V3m-4 4 4-4 4 4M5 12v8h14v-8" />
+          </svg>
+          공유하기
+        </button>
         <button
           id="replay"
           class="replay"
@@ -188,9 +194,59 @@
       <footer>
         <span>2026. 11. 08</span><span class="footer-dot"></span
         ><span>원식 그리고 경민</span
-        ><span class="page-count" id="page-count">01 — 04</span>
+        ><span class="footer-right"
+          ><span id="recipient" class="recipient" hidden></span
+          ><span class="page-count" id="page-count">01 — 04</span></span
+        >
       </footer>
     </div>
+    <dialog
+      id="share-dialog"
+      class="share-dialog"
+      aria-labelledby="share-title"
+      aria-describedby="share-description"
+    >
+      <button
+        id="share-close"
+        class="share-close"
+        type="button"
+        aria-label="공유 창 닫기"
+      >
+        ×
+      </button>
+      <p class="share-eyebrow">A LETTER FOR SOMEONE</p>
+      <h2 id="share-title">누구에게 전하실 건가요?</h2>
+      <p id="share-description">받는 분의 이름을 담아 초대를 전해 주세요.</p>
+      <form id="share-form">
+        <label for="recipient-name"
+          >받는 분 이름 <span class="optional-label">(선택)</span></label
+        >
+        <input
+          id="recipient-name"
+          name="recipient"
+          type="text"
+          placeholder="예: 민수"
+          maxlength="40"
+          autocomplete="off"
+        />
+        <p class="share-hint">이름을 비우면 기본 초대로 전해집니다.</p>
+        <p id="share-preview" class="share-preview"></p>
+        <button id="share-submit" class="share-submit" type="submit">
+          초대 공유하기
+        </button>
+      </form>
+      <div id="share-result" class="share-result" hidden>
+        <label for="share-link">공유할 초대 링크</label>
+        <input id="share-link" type="url" readonly />
+        <button id="share-copy" type="button">링크 복사</button>
+      </div>
+      <p
+        id="share-status"
+        class="share-status"
+        role="status"
+        aria-live="polite"
+      ></p>
+    </dialog>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

@@ -91,6 +91,22 @@ body::before {
   color: #8c9799;
   margin-left: auto;
 }
+.share-open {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  font-size: 12px;
+}
+.share-open svg {
+  width: 17px;
+  height: 17px;
+}
 .replay {
   border: 0;
   background: none;
@@ -487,11 +503,140 @@ footer {
   border-radius: 50%;
 }
 .page-count {
-  margin-left: auto;
   font-size: 9px;
   letter-spacing: 2px;
   color: #92a6aa;
   font-variant-numeric: tabular-nums;
+}
+.footer-right {
+  margin-left: auto;
+  min-width: 0;
+  display: grid;
+  justify-items: end;
+  text-align: right;
+  gap: 8px;
+  max-width: 45%;
+}
+.recipient {
+  font-family: "AppleMyungjo", "Nanum Myeongjo", Georgia, serif;
+  font-size: 15px;
+  line-height: 1.6;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+  color: #44565a;
+}
+.share-dialog {
+  width: min(420px, calc(100% - 36px));
+  max-height: calc(100dvh - 36px);
+  overflow-y: auto;
+  border: 1px solid #e1ddd4;
+  border-radius: 8px;
+  padding: 34px 26px 22px;
+  color: #37494e;
+  background: #fcfaf6;
+  box-shadow: 0 20px 70px #26333326;
+}
+.share-dialog::backdrop {
+  background: #26333366;
+}
+.share-close {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: none;
+  font-size: 24px;
+}
+.share-eyebrow {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #83959a;
+  margin: 0 0 15px;
+}
+.share-dialog h2 {
+  font-family: "AppleMyungjo", "Nanum Myeongjo", Georgia, serif;
+  font-size: 22px;
+  font-weight: 400;
+  margin: 0 0 12px;
+}
+.share-dialog #share-description {
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 0 0 25px;
+  color: #718085;
+}
+.share-dialog label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+.share-dialog input {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid #cbd3cf;
+  border-radius: 4px;
+  background: #fff;
+  color: #37494e;
+  font: inherit;
+  font-size: 16px;
+}
+.share-dialog input:focus-visible {
+  outline: 2px solid #487f96;
+  outline-offset: 2px;
+}
+.share-submit {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 14px;
+  border: 0;
+  border-radius: 4px;
+  background: #445b62;
+  color: #fff;
+  font-size: 15px;
+}
+.share-result {
+  margin-top: 24px;
+}
+.share-result input {
+  font-size: 13px;
+}
+.share-result button {
+  min-height: 44px;
+  border: 0;
+  background: none;
+  text-decoration: underline;
+  padding: 0;
+  font-size: 14px;
+}
+.share-status {
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 14px 0 0;
+}
+.share-status:empty {
+  display: none;
+}
+.optional-label,
+.share-hint {
+  color: #718085;
+  font-size: 12px;
+}
+.share-hint {
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 8px 0 15px;
+}
+.share-preview {
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 0;
+  padding: 12px;
+  border-left: 2px solid #a4c4cd;
+  background: #f3f2ec;
+  overflow-wrap: anywhere;
 }
 .asset-error {
   font-size: 14px;
@@ -896,8 +1041,13 @@ footer {
     font-size: 18px;
   }
   .edition {
-    font-size: 8px;
-    letter-spacing: 1.5px;
+    display: none;
+  }
+  .share-open {
+    margin-left: auto;
+  }
+  .masthead {
+    gap: 8px;
   }
   .arrival {
     margin-top: 24px;
