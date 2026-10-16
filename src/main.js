@@ -169,7 +169,9 @@ document.querySelector("#replay").addEventListener("click", () => {
 document
   .querySelector("#reload")
   .addEventListener("click", () => window.location.reload());
-for (const img of document.querySelectorAll(".card img, .envelope-photo img")) {
+for (const img of document.querySelectorAll(
+  ".card img, .envelope-photo img, .phone-body",
+)) {
   img.addEventListener("error", () => {
     document.querySelector("#asset-error").hidden = false;
   });

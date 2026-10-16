@@ -14,7 +14,7 @@ async function loadFresh(page) {
   await page.goto('./');
   await expect(page.locator('#scene')).toHaveAttribute('data-phase', 'closed');
   await expect.poll(() => page.evaluate(() =>
-    [...document.querySelectorAll('.card img, .envelope-photo img')].every(img => img.complete && img.naturalWidth > 0))).toBe(true);
+    [...document.querySelectorAll('.card img, .envelope-photo img, .phone-body')].every(img => img.complete && img.naturalWidth > 0))).toBe(true);
   await settle(page);
 }
 
@@ -456,7 +456,7 @@ test.describe('guides', () => {
     await settle(page);
     await openCamera(page);
     await expectGuide(page, '휴대전화를 끌어 QR에 맞춰 주세요', '04', 'aim');
-    await expect(page.locator('#camera-status')).toHaveText('QR을 네모 안에 맞춰 주세요');
+    await expect(page.locator('#camera-status')).toHaveText('QR 코드를 찾는 중입니다.');
     await page.locator('#camera-close').click();
     await expectGuide(page, 'QR을 찍으면 다음 이야기로 이어져요', '03', 'aim');
     await page.locator('#replay').click();
@@ -777,7 +777,7 @@ test.describe('reduced motion', () => {
   });
 });
 
-for (const asset of ['front.webp', 'vellum-envelope.png']) {
+for (const asset of ['front.webp', 'vellum-envelope.png', 'phone-body.png']) {
   test(`a failed ${asset} shows recovery guidance and reload recovers`, async ({ page }) => {
     const pattern = `**/${asset}`;
     await page.route(pattern, route => route.fulfill({ status: 404, body: '' }));
@@ -787,7 +787,25 @@ for (const asset of ['front.webp', 'vellum-envelope.png']) {
     await page.locator('#reload').click();
     await expect(page.locator('#asset-error')).toBeHidden();
     await expect.poll(() => page.evaluate(() =>
-      [...document.querySelectorAll('.card img, .envelope-photo img')].every(img => img.complete && img.naturalWidth > 0))).toBe(true);
+      [...document.querySelectorAll('.card img, .envelope-photo img, .phone-body')].every(img => img.complete && img.naturalWidth > 0))).toBe(true);
     await expect(page.locator('#scene')).toHaveAttribute('data-phase', 'closed');
   });
 }
+
+test('supplied Galaxy body contains the scanner UI; light and gallery controls work', async ({ page }) => {
+  await loadFresh(page);
+  await toBack(page);
+  await openCamera(page);
+  await expect(page.locator('.phone-body')).toBeVisible();
+  await expect(page.locator('.reticle i')).toHaveCount(4);
+  await expect(page.locator('#camera-status')).toHaveText('QR 코드를 찾는 중입니다.');
+  await page.getByRole('button', { name: '조명 켜기', exact: true }).click();
+  await expect(page.locator('.phone')).toHaveClass(/light-on/);
+  await expect(page.locator('#camera-light')).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: '청첩장으로 돌아가기', exact: true }).click();
+  await expect(page.locator('#camera-layer')).toBeHidden();
+  await expect(page.locator('#camera-open')).toBeFocused();
+  await openCamera(page);
+  await expect(page.locator('#camera-light')).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('.phone')).not.toHaveClass(/light-on/);
+});

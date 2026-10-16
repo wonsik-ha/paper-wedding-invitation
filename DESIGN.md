@@ -24,7 +24,7 @@ Warm-white #f5f2ed surroundings, ivory paper, blue #91bfd0 accents, dark #384a50
 Final user references: translucent ivory wrap with a vertical overlap, two fine cotton ties and a restrained botanical wax seal. The seal is about 23–25% of the envelope width, attached at the tie crossing. Avoid exaggerated depth. First entry says “청첩장이 도착했습니다!”. Explicit flip remains available at every zoom level and preserves scale/pan; enlarged drags/taps never flip.
 
 ## Components
-Envelope (closed/open), seal, two-sided card (normal/enlarged), persistent animated guide, reader controls, draggable unfolded Fold8-style phone (unaligned/aligned/capture), replay. Scene owns state; small pure helpers own geometry.
+Envelope (closed/open), seal, two-sided card (normal/enlarged), persistent animated guide, reader controls, draggable Galaxy phone using the supplied body photograph (unaligned/aligned/capture), replay. Scene owns state; small pure helpers own geometry.
 
 ## Accessibility
 Visible keyboard focus, named buttons, readable contrast, 44px targets. Extract/flip/zoom/aim alternatives. Guide changes announced as status. Camera supports escape and restores focus. Reduced motion preserves instructions and steps.
@@ -47,4 +47,6 @@ None blocking. Exact spacing, timing, thresholds and rendering are delegated.
 ## Image assets
 The closed envelope uses public/vellum-envelope.png, derived with built-in imagegen from the user-supplied vellum photograph. Prompt: isolate the frontmost envelope, straighten perspective, preserve ivory paper, vertical overlap, white cotton ties and pale botanical seal, transparent background, restrained depth, no writing or surrounding objects. Open envelope layers remain interactive CSS. Original front/back artwork is unchanged.
 
-Camera reference: https://www.samsung.com/us/smartphones/galaxy-z-fold8/ (2026-10-16). Broad unfolded silhouette, thin graphite frame, quiet center crease; an illustrative camera interaction, not a hardware simulator.
+Camera: illustrative interaction, not a hardware simulator. Latest supplied photographs below govern its visible appearance.
+
+Latest camera reference supersedes the wide foldable drawing: use supplied phone-body.png intact as the outer frame, cover its wallpaper with a live simulated invitation preview. Recreate the supplied QR scanner overlay with white corner brackets, QR search text, light/gallery controls and Android navigation details. Light toggles preview brightness; gallery returns to the card; centered shutter captures after manual aiming. No red screenshot background or wallpaper appears in the camera screen.
